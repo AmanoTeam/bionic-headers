@@ -64,6 +64,14 @@ __BEGIN_DECLS
 #elif defined(__i386__)
 /** The size in words of an x86 jmp_buf. Inherited from OpenBSD. */
 #define _JBLEN 10
+#elif defined(__mips__)
+  #if defined(__LP64__)
+      /** The size in words of an mips64 jmp_buf. Inherited from OpenBSD. */
+      #define _JBLEN 25
+  #else
+      /** The size in words of an mips32 jmp_buf. Inherited from OpenBSD. */
+      #define _JBLEN 157
+  #endif
 #elif defined(__riscv)
 /**
  * The size in words of a riscv64 jmp_buf. Room for callee-saved registers,

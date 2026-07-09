@@ -34,6 +34,9 @@
  */
 
 #include <sys/cdefs.h>
+#ifdef __mips__
+#include <asm/cachectl.h>
+#endif
 
 __BEGIN_DECLS
 

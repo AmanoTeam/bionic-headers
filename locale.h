@@ -96,13 +96,19 @@ struct lconv {
   char int_n_sign_posn;
 };
 
-struct lconv* _Nonnull localeconv(void);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+struct lconv* _Nonnull localeconv(void) __INTRODUCED_IN(21);
 
-locale_t _Nullable duplocale(locale_t _Nonnull __l);
-void freelocale(locale_t _Nonnull __l);
-locale_t _Nullable newlocale(int __category_mask, const char* _Nonnull __locale_name, locale_t _Nullable __base);
+locale_t _Nullable duplocale(locale_t _Nonnull __l) __INTRODUCED_IN(21);
+void freelocale(locale_t _Nonnull __l) __INTRODUCED_IN(21);
+locale_t _Nullable newlocale(int __category_mask, const char* _Nonnull __locale_name, locale_t _Nullable __base) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
+
 char* _Nullable setlocale(int __category, const char* _Nullable __locale_name);
-locale_t _Nullable uselocale(locale_t _Nullable __l);
+
+#if __BIONIC_AVAILABILITY_GUARD(21)
+locale_t _Nullable uselocale(locale_t _Nullable __l) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #define LC_GLOBAL_LOCALE __BIONIC_CAST(reinterpret_cast, locale_t, -1L)
 

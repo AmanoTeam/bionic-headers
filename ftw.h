@@ -56,10 +56,15 @@ struct FTW {
 	int level;
 };
 
-int ftw(const char* _Nonnull __dir_path, int (* _Nonnull __callback)(const char* _Nonnull, const struct stat* _Nonnull, int), int __max_fd_count);
-int nftw(const char* _Nonnull __dir_path, int (* _Nonnull __callback)(const char* _Nonnull, const struct stat* _Nonnull, int, struct FTW* _Nonnull), int __max_fd_count, int __flags);
-int ftw64(const char* _Nonnull __dir_path, int (* _Nonnull __callback)(const char* _Nonnull, const struct stat64* _Nonnull, int), int __max_fd_count);
-int nftw64(const char* _Nonnull __dir_path, int (* _Nonnull __callback)(const char* _Nonnull, const struct stat64* _Nonnull, int, struct FTW* _Nonnull), int __max_fd_count, int __flags);
+#if __BIONIC_AVAILABILITY_GUARD(17)
+int ftw(const char* _Nonnull __dir_path, int (* _Nonnull __callback)(const char* _Nonnull, const struct stat* _Nonnull, int), int __max_fd_count) __INTRODUCED_IN(17);
+int nftw(const char* _Nonnull __dir_path, int (* _Nonnull __callback)(const char* _Nonnull, const struct stat* _Nonnull, int, struct FTW* _Nonnull), int __max_fd_count, int __flags) __INTRODUCED_IN(17);
+#endif /* __BIONIC_AVAILABILITY_GUARD(17) */
+
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int ftw64(const char* _Nonnull __dir_path, int (* _Nonnull __callback)(const char* _Nonnull, const struct stat64* _Nonnull, int), int __max_fd_count) __INTRODUCED_IN(21);
+int nftw64(const char* _Nonnull __dir_path, int (* _Nonnull __callback)(const char* _Nonnull, const struct stat64* _Nonnull, int, struct FTW* _Nonnull), int __max_fd_count, int __flags) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 __END_DECLS
 

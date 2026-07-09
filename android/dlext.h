@@ -173,12 +173,14 @@ typedef struct {
   struct android_namespace_t* _Nullable library_namespace;
 } android_dlextinfo;
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /**
  * Opens the given library. The `__filename` and `__flags` arguments are
  * the same as for [dlopen(3)](https://man7.org/linux/man-pages/man3/dlopen.3.html),
  * with the Android-specific flags supplied via the `flags` member of `__info`.
  */
-void* _Nullable android_dlopen_ext(const char* _Nullable __filename, int __flags, const android_dlextinfo* _Nullable __info);
+void* _Nullable android_dlopen_ext(const char* _Nullable __filename, int __flags, const android_dlextinfo* _Nullable __info) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 __END_DECLS
 

@@ -53,12 +53,19 @@ __BEGIN_DECLS
 
 __noreturn void abort(void) __attribute__((__nomerge__));
 __noreturn void exit(int __status);
-__noreturn void _Exit(int __status);
+
+#if __BIONIC_AVAILABILITY_GUARD(21)
+__noreturn void _Exit(int __status) __INTRODUCED_IN(21);
+#else
+__noreturn void _Exit(int __status) __RENAME(_exit);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 int atexit(void (* _Nonnull __fn)(void));
 
-int at_quick_exit(void (* _Nonnull __fn)(void));
-void quick_exit(int __status) __noreturn;
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int at_quick_exit(void (* _Nonnull __fn)(void)) __INTRODUCED_IN(21);
+void quick_exit(int __status) __noreturn __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 /**
  * [getenv(3)](https://man7.org/linux/man-pages/man3/getenv.3.html)
@@ -180,7 +187,10 @@ int mkostemps64(char* _Nonnull __template, int __suffix_length, int __flags) __I
 int mkostemps(char* _Nonnull __template, int __suffix_length, int __flags) __INTRODUCED_IN(23);
 #endif
 
-int mkstemp64(char* _Nonnull __template);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int mkstemp64(char* _Nonnull __template) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
+
 int mkstemp(char* _Nonnull __template);
 
 #if __BIONIC_AVAILABILITY_GUARD(23)
@@ -276,7 +286,9 @@ void arc4random_buf(void* _Nonnull __buf, size_t __n);
 
 #define RAND_MAX 0x7fffffff
 
-int rand_r(unsigned int* _Nonnull __seed_ptr);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int rand_r(unsigned int* _Nonnull __seed_ptr) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 double drand48(void);
 double erand48(unsigned short __xsubi[_Nonnull 3]);
@@ -292,11 +304,17 @@ long nrand48(unsigned short __xsubi[_Nonnull 3]);
 unsigned short* _Nonnull seed48(unsigned short __seed16v[_Nonnull 3]);
 void srand48(long __seed);
 
-char* _Nullable initstate(unsigned int __seed, char* _Nonnull __state, size_t __n);
-char* _Nullable setstate(char* _Nonnull __state);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+char* _Nullable initstate(unsigned int __seed, char* _Nonnull __state, size_t __n) __INTRODUCED_IN(21);
+char* _Nullable setstate(char* _Nonnull __state) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 int getpt(void);
-int posix_openpt(int __flags);
+
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int posix_openpt(int __flags) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
+
 char* _Nullable ptsname(int __fd);
 int ptsname_r(int __fd, char* _Nonnull __buf, size_t __n);
 int unlockpt(int __fd);
@@ -360,7 +378,10 @@ int getloadavg(double __averages[_Nonnull], int __n) __INTRODUCED_IN(29);
 
 
 /* BSD compatibility. */
-const char* _Nullable getprogname(void);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+const char* _Nullable getprogname(void) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
+
 void setprogname(const char* _Nonnull __name);
 
 #if __BIONIC_AVAILABILITY_GUARD(26)
@@ -368,13 +389,20 @@ int mblen(const char* _Nullable __s, size_t __n) __INTRODUCED_IN(26);
 #endif
 
 size_t mbstowcs(wchar_t* _Nullable __dst, const char* _Nullable __src, size_t __n);
-int mbtowc(wchar_t* _Nullable __wc_ptr, const char*  _Nullable __s, size_t __n);
-int wctomb(char* _Nullable __dst, wchar_t __wc);
+
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int mbtowc(wchar_t* _Nullable __wc_ptr, const char*  _Nullable __s, size_t __n) __INTRODUCED_IN(21);
+int wctomb(char* _Nullable __dst, wchar_t __wc) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 size_t wcstombs(char* _Nullable __dst, const wchar_t* _Nullable __src, size_t __n);
 
-size_t __ctype_get_mb_cur_max(void);
+#if __BIONIC_AVAILABILITY_GUARD(21) && !defined(__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__)
+size_t __ctype_get_mb_cur_max(void) __INTRODUCED_IN(21);
 #define MB_CUR_MAX __ctype_get_mb_cur_max()
+#else
+#define MB_CUR_MAX 1
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #if defined(__BIONIC_INCLUDE_FORTIFY_HEADERS)
 #include <bits/fortify/stdlib.h>

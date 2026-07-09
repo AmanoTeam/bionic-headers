@@ -41,7 +41,7 @@
 
 __BEGIN_DECLS
 
-#if defined(__aarch64__) || defined(__riscv)
+#if defined(__aarch64__) || defined(__riscv) || (defined(__mips__) && defined(__LP64__))
 #define __STAT64_BODY \
   dev_t st_dev; \
   ino_t st_ino; \
@@ -60,6 +60,25 @@ __BEGIN_DECLS
   struct timespec st_ctim; \
   unsigned int __unused4; \
   unsigned int __unused5; \
+
+#elif defined(__mips__) && !defined(__LP64__)
+#define __STAT64_BODY \
+  unsigned int st_dev; \
+  unsigned int __pad0[3]; \
+  unsigned long long st_ino; \
+  mode_t st_mode; \
+  nlink_t st_nlink; \
+  uid_t st_uid; \
+  gid_t st_gid; \
+  unsigned int st_rdev; \
+  unsigned int __pad1[3]; \
+  long long st_size; \
+  struct timespec st_atim; \
+  struct timespec st_mtim; \
+  struct timespec st_ctim; \
+  unsigned int st_blksize; \
+  unsigned int __pad2; \
+  unsigned long long st_blocks; \
 
 #elif defined(__x86_64__)
 #define __STAT64_BODY \
@@ -222,8 +241,10 @@ int mkdirat(int __dir_fd, const char* _Nonnull __path, mode_t __mode);
  */
 int fstat(int __fd, struct stat* _Nonnull __buf);
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /** An alias for fstat(). */
-int fstat64(int __fd, struct stat64* _Nonnull __buf);
+int fstat64(int __fd, struct stat64* _Nonnull __buf) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 /**
  * [fstatat(2)](https://man7.org/linux/man-pages/man2/fstatat.2.html)
@@ -233,8 +254,10 @@ int fstat64(int __fd, struct stat64* _Nonnull __buf);
  */
 int fstatat(int __dir_fd, const char* _Nullable __path, struct stat* _Nonnull __buf, int __flags);
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /** An alias for fstatat(). */
-int fstatat64(int __dir_fd, const char* _Nullable __path, struct stat64* _Nonnull __buf, int __flags);
+int fstatat64(int __dir_fd, const char* _Nullable __path, struct stat64* _Nonnull __buf, int __flags) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 /**
  * [lstat(2)](https://man7.org/linux/man-pages/man2/lstat.2.html)
@@ -244,8 +267,10 @@ int fstatat64(int __dir_fd, const char* _Nullable __path, struct stat64* _Nonnul
  */
 int lstat(const char* _Nonnull __path, struct stat* _Nonnull __buf);
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /** An alias for lstat(). */
-int lstat64(const char* _Nonnull __path, struct stat64* _Nonnull __buf);
+int lstat64(const char* _Nonnull __path, struct stat64* _Nonnull __buf) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 /**
  * [stat(2)](https://man7.org/linux/man-pages/man2/stat.2.html)
@@ -255,8 +280,10 @@ int lstat64(const char* _Nonnull __path, struct stat64* _Nonnull __buf);
  */
 int stat(const char* _Nonnull __path, struct stat* _Nonnull __buf);
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /** An alias for stat(). */
-int stat64(const char* _Nonnull __path, struct stat64* _Nonnull __buf);
+int stat64(const char* _Nonnull __path, struct stat64* _Nonnull __buf) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 /**
  * [mknod(2)](https://man7.org/linux/man-pages/man2/mknod.2.html)
@@ -266,13 +293,15 @@ int stat64(const char* _Nonnull __path, struct stat64* _Nonnull __buf);
  */
 int mknod(const char* _Nonnull __path, mode_t __mode, dev_t __dev);
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /**
  * [mknodat(2)](https://man7.org/linux/man-pages/man2/mknodat.2.html)
  * creates a directory, special, or regular file.
  *
  * Returns 0 on success and returns -1 and sets `errno` on failure.
  */
-int mknodat(int __dir_fd, const char* _Nonnull __path, mode_t __mode, dev_t __dev);
+int mknodat(int __dir_fd, const char* _Nonnull __path, mode_t __mode, dev_t __dev) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 /**
  * [umask(2)](https://man7.org/linux/man-pages/man2/umask.2.html)
@@ -286,13 +315,15 @@ mode_t umask(mode_t __mask);
 #include <bits/fortify/stat.h>
 #endif
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /**
  * [mkfifo(2)](https://man7.org/linux/man-pages/man2/mkfifo.2.html)
  * creates a FIFO.
  *
  * Returns 0 on success and returns -1 and sets `errno` on failure.
  */
-int mkfifo(const char* _Nonnull __path, mode_t __mode);
+int mkfifo(const char* _Nonnull __path, mode_t __mode) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #if __BIONIC_AVAILABILITY_GUARD(23)
 /**
@@ -332,6 +363,7 @@ int mkfifoat(int __dir_fd, const char* _Nonnull __path, mode_t __mode) __INTRODU
  */
 int utimensat(int __dir_fd, const char* __BIONIC_COMPLICATED_NULLNESS __path, const struct timespec __times[_Nullable 2], int __flags);
 
+#if __BIONIC_AVAILABILITY_GUARD(19)
 /**
  * [futimens(3)](https://man7.org/linux/man-pages/man3/futimens.3.html) sets
  * the given file descriptor's timestamp.
@@ -342,7 +374,8 @@ int utimensat(int __dir_fd, const char* __BIONIC_COMPLICATED_NULLNESS __path, co
  *
  * Returns 0 on success and returns -1 and sets `errno` on failure.
  */
-int futimens(int __fd, const struct timespec __times[_Nullable 2]);
+int futimens(int __fd, const struct timespec __times[_Nullable 2]) __INTRODUCED_IN(19);
+#endif /* __BIONIC_AVAILABILITY_GUARD(19) */
 
 #if defined(__USE_GNU) && __BIONIC_AVAILABILITY_GUARD(30)
 /**
@@ -357,3 +390,5 @@ int statx(int __dir_fd, const char* _Nullable __path, int __flags, unsigned __ma
 #endif
 
 __END_DECLS
+
+#include <android/legacy_sys_stat_inlines.h>

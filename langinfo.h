@@ -94,10 +94,10 @@ __BEGIN_DECLS
 
 #if __BIONIC_AVAILABILITY_GUARD(26)
 char* _Nonnull nl_langinfo(nl_item __item) __INTRODUCED_IN(26);
-#endif
-
-#if __BIONIC_AVAILABILITY_GUARD(26)
 char* _Nonnull nl_langinfo_l(nl_item __item, locale_t _Nonnull __l) __INTRODUCED_IN(26);
+#else
+__static_inline__ char* _Nonnull nl_langinfo(nl_item __item) { return "ASCII"; }
+__static_inline__ char* _Nonnull nl_langinfo_l(nl_item __item, locale_t _Nonnull __l) { return "ASCII"; }
 #endif
 
 __END_DECLS

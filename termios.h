@@ -149,10 +149,6 @@ int tcsetattr(int __fd, int __optional_actions, const struct termios* _Nonnull _
 
 #endif
 
-#if __ANDROID_API__ >= 35
-// These two functions were POSIX Issue 8 additions that we can also trivially
-// implement as inlines for older OS version.
-
 /**
  * tcgetwinsize(3) gets the window size of the given terminal.
  *
@@ -166,7 +162,6 @@ int tcgetwinsize(int __fd, struct winsize* _Nonnull __size);
  * Returns 0 on success and returns -1 and sets `errno` on failure.
  */
 int tcsetwinsize(int __fd, const struct winsize* _Nonnull __size);
-#endif
 
 __END_DECLS
 

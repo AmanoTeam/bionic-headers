@@ -62,13 +62,12 @@ typedef __float_t float_t;
 
 #define isfinite(x) __builtin_isfinite(x)
 
-#define isinf(x) __builtin_isinf(x)
-
-#define isnan(x) __builtin_isnan(x)
-
 #define isnormal(x) __builtin_isnormal(x)
 
 #define signbit(x) __builtin_signbit(x)
+
+#define isinf(x) __builtin_isinf(x)
+#define isnan(x) __builtin_isnan(x)
 
 double acos(double __x);
 float acosf(float __x);
@@ -390,8 +389,8 @@ double lgamma_r(double __x, int* _Nonnull __sign);
 double significand(double __x);
 #endif
 
-#if (defined(__USE_BSD) || defined(__USE_GNU)) && __BIONIC_AVAILABILITY_GUARD(23)
-long double lgammal_r(long double __x, int* _Nonnull __sign) __INTRODUCED_IN(23);
+#if (defined(__USE_BSD) || defined(__USE_GNU))
+long double lgammal_r(long double __x, int* _Nonnull __sign);
 #endif
 
 #if defined(__USE_BSD) || defined(__USE_GNU)

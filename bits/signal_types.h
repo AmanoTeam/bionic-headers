@@ -144,6 +144,25 @@ struct sigaction64 { __SIGACTION_BODY };
 #undef sa_handler
 #undef sa_sigaction
 
+#if defined(__mips__)
+#define __SIGACTION_BODY \
+  unsigned int sa_flags; \
+  union { \
+    sighandler_t sa_handler; \
+    void (*sa_sigaction)(int, struct siginfo*, void*); \
+  }; \
+  sigset_t sa_mask;
+#else
+#define __SIGACTION_BODY \
+  union { \
+    sighandler_t sa_handler; \
+    void (*sa_sigaction)(int, struct siginfo*, void*); \
+  }; \
+  sigset_t sa_mask; \
+  int sa_flags; \
+  void (*sa_restorer)(void);
+#endif
+
 /**
  * Used with sigaction().
  *
@@ -154,16 +173,11 @@ struct sigaction64 { __SIGACTION_BODY };
  * (32-bit ABI bugs)[https://android.googlesource.com/platform/bionic/+/main/docs/32-bit-abi.md#is-too-small-for-real_time-signals]
  * documentation.
  */
-struct sigaction {
-  union {
-    sighandler_t sa_handler;
-    void (*sa_sigaction)(int, struct siginfo*, void*);
-  };
-  sigset_t sa_mask;
-  int sa_flags;
-  void (*sa_restorer)(void);
-};
+struct sigaction { __SIGACTION_BODY };
 
+#undef __SIGACTION_BODY
+
+#if !defined(__mips__)
 /**
  * Used with sigaction64().
  *
@@ -184,6 +198,7 @@ struct sigaction64 {
   void (*sa_restorer)(void);
   sigset64_t sa_mask;
 };
+#endif
 
 #endif
 

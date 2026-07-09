@@ -92,13 +92,14 @@ struct statvfs64 { __STATVFS64_BODY __STATVFS64_CODA };
 /** Flag for `f_flag` in `struct statvfs`: don't follow symlinks. */
 #define ST_NOSYMFOLLOW 0x2000
 
+#if __BIONIC_AVAILABILITY_GUARD(19)
 /**
  * [statvfs(3)](https://man7.org/linux/man-pages/man3/statvfs.3.html)
  * queries filesystem statistics for the given path.
  *
  * Returns 0 on success, and returns -1 and sets `errno` on failure.
  */
-int statvfs(const char* _Nonnull __path, struct statvfs* _Nonnull __buf);
+int statvfs(const char* _Nonnull __path, struct statvfs* _Nonnull __buf) __INTRODUCED_IN(19);
 
 /**
  * [fstatvfs(3)](https://man7.org/linux/man-pages/man3/fstatvfs.3.html)
@@ -106,12 +107,15 @@ int statvfs(const char* _Nonnull __path, struct statvfs* _Nonnull __buf);
  *
  * Returns 0 on success, and returns -1 and sets `errno` on failure.
  */
-int fstatvfs(int __fd, struct statvfs* _Nonnull __buf);
+int fstatvfs(int __fd, struct statvfs* _Nonnull __buf) __INTRODUCED_IN(19);
+#endif /* __BIONIC_AVAILABILITY_GUARD(19) */
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /** Equivalent to statvfs() . */
-int statvfs64(const char* _Nonnull __path, struct statvfs64* _Nonnull __buf);
+int statvfs64(const char* _Nonnull __path, struct statvfs64* _Nonnull __buf) __INTRODUCED_IN(21);
 
 /** Equivalent to fstatvfs(). */
-int fstatvfs64(int __fd, struct statvfs64* _Nonnull __buf);
+int fstatvfs64(int __fd, struct statvfs64* _Nonnull __buf) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 __END_DECLS

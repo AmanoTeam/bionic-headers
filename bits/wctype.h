@@ -39,7 +39,11 @@ typedef __WINT_TYPE__ wint_t;
 
 int iswalnum(wint_t __wc);
 int iswalpha(wint_t __wc);
-int iswblank(wint_t __wc);
+
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int iswblank(wint_t __wc) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
+
 int iswcntrl(wint_t __wc);
 int iswdigit(wint_t __wc);
 int iswgraph(wint_t __wc);

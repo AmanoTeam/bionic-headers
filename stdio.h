@@ -69,7 +69,7 @@ extern FILE* _Nonnull stderr __INTRODUCED_IN(23);
 #define stderr stderr
 #else
 /* Before M the actual symbols for stdin and friends had different names. */
-extern FILE __sF[] __REMOVED_IN(23, "Use stdin/stdout/stderr");
+extern FILE __sF[] /* __REMOVED_IN(23, "Use stdin/stdout/stderr") */;
 
 #define stdin (&__sF[0])
 #define stdout (&__sF[1])
@@ -128,6 +128,7 @@ size_t fwrite(const void* _Nonnull __buf, size_t __size, size_t __count, FILE* _
 __nodiscard int getc(FILE* _Nonnull __fp);
 __nodiscard int getchar(void);
 
+#if __BIONIC_AVAILABILITY_GUARD(18)
 /**
  * [getdelim(2)](https://man7.org/linux/man-pages/man3/getdelim.3.html)
  * reads a delimited chunk from the given file.
@@ -141,12 +142,13 @@ __nodiscard int getchar(void);
  * Returns the length of the chunk (excluding the terminating NUL),
  * and returns -1 and sets `errno` on failure.
  */
-ssize_t getdelim(char* _Nullable * _Nonnull __line_ptr, size_t* _Nonnull __allocated_size_ptr, int __delimiter, FILE* _Nonnull __fp);
+ssize_t getdelim(char* _Nullable * _Nonnull __line_ptr, size_t* _Nonnull __allocated_size_ptr, int __delimiter, FILE* _Nonnull __fp) __INTRODUCED_IN(18);
 
 /**
  * Equivalent to getdelim() with '\n' as the delimiter.
  */
-ssize_t getline(char* _Nullable * _Nonnull __line_ptr, size_t* _Nonnull __allocated_size_ptr, FILE* _Nonnull __fp);
+ssize_t getline(char* _Nullable * _Nonnull __line_ptr, size_t* _Nonnull __allocated_size_ptr, FILE* _Nonnull __fp) __INTRODUCED_IN(18);
+#endif /* __BIONIC_AVAILABILITY_GUARD(18) */
 
 void perror(const char* _Nullable __msg);
 int printf(const char* _Nonnull __fmt, ...) __printflike(1, 2);
@@ -183,8 +185,13 @@ int ungetc(int __ch, FILE* _Nonnull __fp);
 int vfprintf(FILE* _Nonnull __fp, const char* _Nonnull __fmt, va_list __args) __printflike(2, 0);
 int vprintf(const char* _Nonnull __fp, va_list __args) __printflike(1, 0);
 
-int dprintf(int __fd, const char* _Nonnull __fmt, ...) __printflike(2, 3);
-int vdprintf(int __fd, const char* _Nonnull __fmt, va_list __args) __printflike(2, 0);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int dprintf(int __fd, const char* _Nonnull __fmt, ...) __printflike(2, 3) __INTRODUCED_IN(21);
+int vdprintf(int __fd, const char* _Nonnull __fmt, va_list __args) __printflike(2, 0) __INTRODUCED_IN(21);
+#else
+int dprintf(int __fd, const char* _Nonnull __fmt, ...) __RENAME(fdprintf) __printflike(2, 3);
+int vdprintf(int __fd, const char* _Nonnull __fmt, va_list __args) __RENAME(vfdprintf) __printflike(2, 0);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #if (defined(__STDC_VERSION__) && __STDC_VERSION__ < 201112L) || \
     (defined(__cplusplus) && __cplusplus < 201402L)

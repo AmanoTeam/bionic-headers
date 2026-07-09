@@ -38,13 +38,14 @@
 
 __BEGIN_DECLS
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /**
  * [setfsuid(2)](https://man7.org/linux/man-pages/man2/setfsuid.2.html) sets the UID used for
  * filesystem checks.
  *
  * Returns the previous UID.
  */
-int setfsuid(uid_t __uid);
+int setfsuid(uid_t __uid) __INTRODUCED_IN(21);
 
 /**
  * [setfsgid(2)](https://man7.org/linux/man-pages/man2/setfsgid.2.html) sets the GID used for
@@ -52,6 +53,7 @@ int setfsuid(uid_t __uid);
  *
  * Returns the previous GID.
  */
-int setfsgid(gid_t __gid);
+int setfsgid(gid_t __gid) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 __END_DECLS

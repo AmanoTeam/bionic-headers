@@ -52,8 +52,8 @@ void* _Nullable memrchr(const void* _Nonnull __s, int __ch, size_t __n) __attrib
 int memcmp(const void* _Nonnull __lhs, const void* _Nonnull __rhs, size_t __n) __attribute_pure__;
 void* _Nonnull memcpy(void* _Nonnull, const void* _Nonnull, size_t);
 
-#if defined(__USE_GNU) && __BIONIC_AVAILABILITY_GUARD(23)
-void* _Nonnull mempcpy(void* _Nonnull __dst, const void* _Nonnull __src, size_t __n) __INTRODUCED_IN(23);
+#if defined(__USE_GNU)
+void* _Nonnull mempcpy(void* _Nonnull __dst, const void* _Nonnull __src, size_t __n);
 #endif
 
 void* _Nonnull memmove(void* _Nonnull __dst, const void* _Nonnull __src, size_t __n);
@@ -66,7 +66,6 @@ void* _Nonnull memmove(void* _Nonnull __dst, const void* _Nonnull __src, size_t 
  */
 void* _Nonnull memset(void* _Nonnull __dst, int __ch, size_t __n);
 
-#if __ANDROID_API__ >= 34
 /**
  * [memset_explicit(3)](https://man7.org/linux/man-pages/man3/memset_explicit.3.html)
  * writes the bottom 8 bits of the given int to the next `n` bytes of `dst`,
@@ -76,17 +75,15 @@ void* _Nonnull memset(void* _Nonnull __dst, int __ch, size_t __n);
  *
  * Available from API level 34, or with __ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__.
  */
-void* _Nonnull memset_explicit(void* _Nonnull __dst, int __ch, size_t __n) __INTRODUCED_IN(34);
-#elif defined(__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__)
-#define __BIONIC_MEMSET_EXPLICIT_INLINE static __inline
-#include <bits/memset_explicit_impl.h>
-#undef __BIONIC_MEMSET_EXPLICIT_INLINE
-#endif
+void* _Nonnull memset_explicit(void* _Nonnull __dst, int __ch, size_t __n);
 
 void* _Nullable memmem(const void* _Nonnull __haystack, size_t __haystack_size, const void* _Nonnull __needle, size_t __needle_size) __attribute_pure__;
 
 char* _Nullable strchr(const char* _Nonnull __s, int __ch) __attribute_pure__;
-char* _Nullable __strchr_chk(const char* _Nonnull __s, int __ch, size_t __n);
+
+#if __BIONIC_AVAILABILITY_GUARD(18)
+char* _Nullable __strchr_chk(const char* _Nonnull __s, int __ch, size_t __n) __INTRODUCED_IN(18);
+#endif /* __BIONIC_AVAILABILITY_GUARD(18) */
 
 #if defined(__USE_GNU) && __BIONIC_AVAILABILITY_GUARD(24)
 #if defined(__cplusplus)
@@ -98,13 +95,25 @@ char* _Nonnull strchrnul(const char* _Nonnull __s, int __ch) __attribute_pure__ 
 #endif
 
 char* _Nullable strrchr(const char* _Nonnull __s, int __ch) __attribute_pure__;
-char* _Nullable __strrchr_chk(const char* _Nonnull __s, int __ch, size_t __n);
+
+#if __BIONIC_AVAILABILITY_GUARD(18)
+char* _Nullable __strrchr_chk(const char* _Nonnull __s, int __ch, size_t __n) __INTRODUCED_IN(18);
+#endif /* __BIONIC_AVAILABILITY_GUARD(18) */
 
 size_t strlen(const char* _Nonnull __s) __attribute_pure__;
-size_t __strlen_chk(const char* _Nonnull __s, size_t __n);
+
+#if __BIONIC_AVAILABILITY_GUARD(17)
+size_t __strlen_chk(const char* _Nonnull __s, size_t __n) __INTRODUCED_IN(17);
+#endif /* __BIONIC_AVAILABILITY_GUARD(17) */
 
 int strcmp(const char* _Nonnull __lhs, const char* _Nonnull __rhs) __attribute_pure__;
-char* _Nonnull stpcpy(char* _Nonnull __dst, const char* _Nonnull __src);
+
+#if __BIONIC_AVAILABILITY_GUARD(21)
+char* _Nonnull stpcpy(char* _Nonnull __dst, const char* _Nonnull __src) __INTRODUCED_IN(21);
+#else
+__static_inline__ char* _Nonnull stpcpy(char* _Nonnull __dst, const char* _Nonnull __src) { return __builtin_stpcpy(__dst, __src); }
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
+
 char* _Nonnull strcpy(char* _Nonnull __dst, const char* _Nonnull __src);
 char* _Nonnull strcat(char* _Nonnull __dst, const char* _Nonnull __src);
 char* _Nullable strdup(const char* _Nonnull __s);
@@ -200,6 +209,7 @@ size_t strnlen(const char* _Nonnull __s, size_t __n) __attribute_pure__;
 char* _Nonnull strncat(char* _Nonnull __dst, const char* _Nonnull __src, size_t __n);
 char* _Nullable strndup(const char* _Nonnull __s, size_t __n);
 int strncmp(const char* _Nonnull __lhs, const char* _Nonnull __rhs, size_t __n) __attribute_pure__;
+
 char* _Nonnull stpncpy(char* _Nonnull __dst, const char* _Nonnull __src, size_t __n);
 char* _Nonnull strncpy(char* _Nonnull __dst, const char* _Nonnull __src, size_t __n);
 
@@ -253,13 +263,19 @@ char* _Nonnull strsignal(int __signal);
 
 /** Equivalent to strcmp() on Android. */
 int strcoll(const char* _Nonnull __lhs, const char* _Nonnull __rhs) __attribute_pure__;
+
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /** Equivalent to strcmp() on Android. */
-int strcoll_l(const char* _Nonnull __lhs, const char* _Nonnull __rhs, locale_t _Nonnull __l) __attribute_pure__;
+int strcoll_l(const char* _Nonnull __lhs, const char* _Nonnull __rhs, locale_t _Nonnull __l) __attribute_pure__ __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 /** Equivalent to strlcpy() on Android. */
 size_t strxfrm(char* __BIONIC_COMPLICATED_NULLNESS __dst, const char* _Nonnull __src, size_t __n);
+
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /** Equivalent to strlcpy() on Android. */
-size_t strxfrm_l(char* __BIONIC_COMPLICATED_NULLNESS __dst, const char* _Nonnull __src, size_t __n, locale_t _Nonnull __l);
+size_t strxfrm_l(char* __BIONIC_COMPLICATED_NULLNESS __dst, const char* _Nonnull __src, size_t __n, locale_t _Nonnull __l) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 /*
  * glibc has a basename in <string.h> that's different to the POSIX one in <libgen.h>.
@@ -279,7 +295,7 @@ char* _Nonnull basename(const char* _Nonnull __path) __RENAME(__gnu_basename) __
 #endif
 
 /* Const-correct overloads. Placed after FORTIFY so we call those functions, if possible. */
-#if defined(__cplusplus)
+#if defined(__cplusplus) && defined(__clang__)
 /* libcxx tries to provide these. Suppress that, since libcxx's impl doesn't respect FORTIFY. */
 #define __CORRECT_ISO_CPP_STRING_H_PROTO
 /* Used to make these preferable over regular <string.h> signatures for overload resolution. */

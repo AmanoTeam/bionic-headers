@@ -99,6 +99,7 @@ struct dl_phdr_info {
   void* _Nullable dlpi_tls_data;
 };
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /**
  * [dl_iterate_phdr(3)](https://man7.org/linux/man-pages/man3/dl_iterate_phdr.3.html)
  * calls the given callback once for every loaded shared object.
@@ -118,7 +119,8 @@ struct dl_phdr_info {
  *
  * Returns the value returned by the final call to the callback.
  */
-int dl_iterate_phdr(int (* _Nonnull __callback)(struct dl_phdr_info* _Nonnull __info, size_t __size, void* _Nullable __data), void* _Nullable __data);
+int dl_iterate_phdr(int (* _Nonnull __callback)(struct dl_phdr_info* _Nonnull __info, size_t __size, void* _Nullable __data), void* _Nullable __data) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #ifdef __arm__
 typedef uintptr_t _Unwind_Ptr;

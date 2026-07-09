@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,28 +26,23 @@
  * SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef _ANDROID_LEGACY_SYS_STAT_INLINES_H_
+#define _ANDROID_LEGACY_SYS_STAT_INLINES_H_
 
 #include <sys/cdefs.h>
 
-#include <errno.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
+#if __ANDROID_API__ < 21
 
-#include <linux/termios.h>
-
-#if !defined(__BIONIC_TERMIOS_WINSIZE_INLINE)
-#define __BIONIC_TERMIOS_WINSIZE_INLINE static __inline
-#endif
+#include <sys/stat.h>
 
 __BEGIN_DECLS
 
-__BIONIC_TERMIOS_WINSIZE_INLINE int tcgetwinsize(int __fd, struct winsize* _Nonnull __size) {
-  return ioctl(__fd, TIOCGWINSZ, __size);
-}
-
-__BIONIC_TERMIOS_WINSIZE_INLINE int tcsetwinsize(int __fd, const struct winsize* _Nonnull __size) {
-  return ioctl(__fd, TIOCSWINSZ, __size);
+__static_inline__ int mkfifo(const char* __path, mode_t __mode) {
+  return mknod(__path, (__mode & ~S_IFMT) | S_IFIFO, (dev_t)0);
 }
 
 __END_DECLS
+
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
+
+#endif /* _ANDROID_LEGACY_SYS_STAT_INLINES_H_ */

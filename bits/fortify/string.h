@@ -38,15 +38,19 @@ void* _Nullable __memchr_chk(const void* _Nonnull, int, size_t, size_t) __INTROD
 void* _Nullable __memrchr_chk(const void* _Nonnull, int, size_t, size_t) __INTRODUCED_IN(23);
 #endif
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 char* _Nonnull __stpncpy_chk2(char* _Nonnull, const char* _Nonnull, size_t, size_t, size_t);
 char* _Nonnull __strncpy_chk2(char* _Nonnull, const char* _Nonnull, size_t, size_t, size_t);
+#endif
+
+#if __BIONIC_AVAILABILITY_GUARD(17)
 size_t __strlcpy_chk(char* _Nonnull, const char* _Nonnull, size_t, size_t);
 size_t __strlcat_chk(char* _Nonnull, const char* _Nonnull, size_t, size_t);
+#endif
 
 #if defined(__BIONIC_FORTIFY)
 
-/* hwasan intercepts memcpy() but not the _chk variant. */
-#if __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED && !__has_feature(hwaddress_sanitizer)
+#if __ANDROID_API__ >= 17 && __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED && !__has_feature(hwaddress_sanitizer)
 /* No diag -- clang diagnoses misuses of this on its own.  */
 __BIONIC_FORTIFY_INLINE
 void* _Nonnull memcpy(void* _Nonnull const dst __pass_object_size0, const void* _Nonnull src, size_t copy_amount)
@@ -57,7 +61,7 @@ void* _Nonnull memcpy(void* _Nonnull const dst __pass_object_size0, const void* 
 #endif
 
 /* hwasan intercepts memmove() but not the _chk variant. */
-#if __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED && !__has_feature(hwaddress_sanitizer)
+#if __ANDROID_API__ >= 17 && __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED && !__has_feature(hwaddress_sanitizer)
 /* No diag -- clang diagnoses misuses of this on its own.  */
 __BIONIC_FORTIFY_INLINE
 void* _Nonnull memmove(void* _Nonnull const dst __pass_object_size0, const void* _Nonnull src, size_t len)
@@ -75,7 +79,7 @@ void* _Nonnull memset(void* _Nonnull const s __pass_object_size0, int c, size_t 
         /* If you're a user who wants this warning to go away: use `(&memset)(foo, bar, baz)`. */
         __clang_warning_if(!n, "'memset' will set 0 bytes; maybe the arguments got flipped?") {
 /* hwasan intercepts memset() but not the _chk variant. */
-#if __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED && !__has_feature(hwaddress_sanitizer)
+#if __ANDROID_API__ >= 17 && __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED && !__has_feature(hwaddress_sanitizer)
     return __builtin___memset_chk(s, c, n, __bos0(s));
 #else
     return __builtin_memset(s, c, n);
@@ -97,6 +101,7 @@ void* _Nonnull mempcpy(void* _Nonnull const dst __pass_object_size0, const void*
 }
 #endif
 
+#if __ANDROID_API__ >= 21
 __BIONIC_FORTIFY_INLINE
 char* _Nonnull stpcpy(char* _Nonnull const dst __pass_object_size, const char* _Nonnull src)
         __overloadable
@@ -108,12 +113,13 @@ char* _Nonnull stpcpy(char* _Nonnull const dst __pass_object_size, const char* _
     return __builtin_stpcpy(dst, src);
 #endif
 }
+#endif
 
 __BIONIC_FORTIFY_INLINE
 char* _Nonnull strcpy(char* _Nonnull const dst __pass_object_size, const char* _Nonnull src)
         __diagnose_as_builtin(__builtin_strcpy, 1, 2)
         __overloadable {
-#if __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
+#if __ANDROID_API__ >= 17 && __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
     return __builtin___strcpy_chk(dst, src, __bos(dst));
 #else
     return __builtin_strcpy(dst, src);
@@ -125,14 +131,14 @@ char* _Nonnull strcat(char* _Nonnull const dst __pass_object_size, const char* _
         __overloadable
         __clang_error_if(__bos_unevaluated_le(__bos(dst), __builtin_strlen(src)),
                          "'strcat' called with string bigger than buffer") {
-#if __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
+#if __ANDROID_API__ >= 17 && __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
     return __builtin___strcat_chk(dst, src, __bos(dst));
 #else
     return __builtin_strcat(dst, src);
 #endif
 }
 
-#if __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
+#if __ANDROID_API__ >= 17 && __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
 /* No diag -- clang diagnoses misuses of this on its own.  */
 __BIONIC_FORTIFY_INLINE
 char* _Nonnull strncat(char* _Nonnull const dst __pass_object_size, const char* _Nonnull src, size_t n)
@@ -168,7 +174,7 @@ void* _Nullable __memrchr_fortify(const void* _Nonnull const __pass_object_size 
 }
 #endif
 
-#if __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
+#if __ANDROID_API__ >= 21 && __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
 /* No diag -- clang diagnoses misuses of this on its own.  */
 __BIONIC_FORTIFY_INLINE
 char* _Nonnull stpncpy(char* _Nonnull const dst __pass_object_size, const char* _Nonnull const src __pass_object_size, size_t n)
@@ -207,7 +213,7 @@ size_t strlcpy(char* _Nonnull const dst __pass_object_size, const char* _Nonnull
         __overloadable
         __clang_error_if(__bos_unevaluated_lt(__bos(dst), size),
                          "'strlcpy' called with size bigger than buffer") {
-#if __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
+#if __ANDROID_API__ >= 17 && __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
     return __strlcpy_chk(dst, src, size, __bos(dst));
 #else
     return __call_bypassing_fortify(strlcpy)(dst, src, size);
@@ -219,28 +225,35 @@ size_t strlcat(char* _Nonnull const dst __pass_object_size, const char* _Nonnull
         __overloadable
         __clang_error_if(__bos_unevaluated_lt(__bos(dst), size),
                          "'strlcat' called with size bigger than buffer") {
-#if __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
+#if __ANDROID_API__ >= 17 && __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
     return __strlcat_chk(dst, src, size, __bos(dst));
 #else
     return __call_bypassing_fortify(strlcat)(dst, src, size);
 #endif
 }
 
-#if __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
+#if __ANDROID_API__ >= 17 && __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
 /*
  * Clang, when parsing C, can fold strlen to a constant without LLVM's help.
  * This doesn't apply to overloads of strlen, so write this differently. We
  * can't use `__pass_object_size0` here, but that's fine: it doesn't help much
  * on __always_inline functions.
  */
+#  if defined(__clang__)
 extern __always_inline __inline__ __attribute__((gnu_inline)) size_t strlen(const char* _Nonnull s) {
     return __strlen_chk(s, __bos0(s));
 }
+#  else
+__BIONIC_FORTIFY_INLINE __attribute__((nonnull(1)))
+size_t strlen(const char* s) {
+    return __strlen_chk(s, __bos0(s));
+}
+#  endif
 #endif
 
 __BIONIC_FORTIFY_INLINE
 char* _Nullable strchr(const char* _Nonnull const s __pass_object_size, int c) __overloadable {
-#if __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
+#if __ANDROID_API__ >= 18 && __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
     size_t bos = __bos(s);
 
     if (bos != __BIONIC_FORTIFY_UNKNOWN_SIZE) {
@@ -252,7 +265,7 @@ char* _Nullable strchr(const char* _Nonnull const s __pass_object_size, int c) _
 
 __BIONIC_FORTIFY_INLINE
 char* _Nullable strrchr(const char* _Nonnull const s __pass_object_size, int c) __overloadable {
-#if __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
+#if __ANDROID_API__ >= 18 && __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
     size_t bos = __bos(s);
 
     if (bos != __BIONIC_FORTIFY_UNKNOWN_SIZE) {

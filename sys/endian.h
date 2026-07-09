@@ -95,28 +95,38 @@ __BEGIN_DECLS
 /** The byte order of bitfields. Accidental Linux header leakage. */
 #define __LITTLE_ENDIAN_BITFIELD
 
-
 /*
  * POSIX has these in <arpa/inet.h>,
  * but we have them here for glibc source compatibility.
  */
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /** Swap host (little-endian) 32-bit quantity to network (big-endian). */
-uint32_t htonl(uint32_t __x) __attribute_const__;
+uint32_t htonl(uint32_t __x) __attribute_const__ __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
+
 #define htonl(x) __swap32(x)
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /** Swap host (little-endian) 16-bit quantity to network (big-endian). */
-uint16_t htons(uint16_t __x) __attribute_const__;
+uint16_t htons(uint16_t __x) __attribute_const__ __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
+
 #define htons(x) __swap16(x)
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /** Swap network (big-endian) 32-bit quantity to host (little-endian). */
-uint32_t ntohl(uint32_t __x) __attribute_const__;
+uint32_t ntohl(uint32_t __x) __attribute_const__ __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
+
 #define ntohl(x) __swap32(x)
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /** Swap network (big-endian) 16-bit quantity to host (little-endian). */
-uint16_t ntohs(uint16_t __x) __attribute_const__;
-#define ntohs(x) __swap16(x)
+uint16_t ntohs(uint16_t __x) __attribute_const__ __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
+#define ntohs(x) __swap16(x)
 
 /* Bionic additions */
 

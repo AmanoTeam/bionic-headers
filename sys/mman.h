@@ -95,13 +95,14 @@ int mprotect(void* _Nonnull __addr, size_t __size, int __prot);
  */
 void* _Nonnull mremap(void* _Nonnull __old_addr, size_t __old_size, size_t __new_size, int __flags, ...);
 
+#if __BIONIC_AVAILABILITY_GUARD(17)
 /**
  * [mlockall(2)](https://man7.org/linux/man-pages/man2/mlockall.2.html)
  * locks pages (preventing swapping).
  *
  * Returns 0 on success, and returns -1 and sets `errno` on failure.
  */
-int mlockall(int __flags);
+int mlockall(int __flags) __INTRODUCED_IN(17);
 
 /**
  * [munlockall(2)](https://man7.org/linux/man-pages/man2/munlockall.2.html)
@@ -109,7 +110,8 @@ int mlockall(int __flags);
  *
  * Returns 0 on success, and returns -1 and sets `errno` on failure.
  */
-int munlockall(void);
+int munlockall(void) __INTRODUCED_IN(17);
+#endif /* __BIONIC_AVAILABILITY_GUARD(17) */
 
 /**
  * [mlock(2)](https://man7.org/linux/man-pages/man2/mlock.2.html)

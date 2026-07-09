@@ -39,6 +39,7 @@
 
 __BEGIN_DECLS
 
+#if __BIONIC_AVAILABILITY_GUARD(18)
 /**
  * [getauxval(3)](https://man7.org/linux/man-pages/man3/getauxval.3.html) returns values from
  * the ELF auxiliary vector passed by the kernel.
@@ -46,6 +47,11 @@ __BEGIN_DECLS
  * Returns the corresponding value on success,
  * and returns 0 and sets `errno` to `ENOENT` on failure.
  */
-unsigned long int getauxval(unsigned long int __type);
+unsigned long int getauxval(unsigned long int __type) __INTRODUCED_IN(18);
+#endif /* __BIONIC_AVAILABILITY_GUARD(18) */
+
+#if __BIONIC_AVAILABILITY_GUARD(18)
+unsigned long int __getauxval(unsigned long int __type) __RENAME(getauxval) __INTRODUCED_IN(18);
+#endif /* __BIONIC_AVAILABILITY_GUARD(18) */
 
 __END_DECLS

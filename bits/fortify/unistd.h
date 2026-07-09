@@ -57,7 +57,9 @@ ssize_t __pwrite64_chk(int, const void* _Nonnull, size_t, off64_t, size_t) __INT
 
 ssize_t __pwrite64_real(int, const void* _Nonnull, size_t, off64_t) __RENAME(pwrite64);
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 ssize_t __read_chk(int, void* __BIONIC_COMPLICATED_NULLNESS, size_t, size_t);
+#endif
 
 #if __BIONIC_AVAILABILITY_GUARD(24)
 ssize_t __write_chk(int, const void* __BIONIC_COMPLICATED_NULLNESS, size_t, size_t) __INTRODUCED_IN(24);
@@ -175,7 +177,7 @@ ssize_t read(int fd, void* const __BIONIC_COMPLICATED_NULLNESS __pass_object_siz
         __overloadable
         __error_if_overflows_ssizet(count, read)
         __error_if_overflows_objectsize(count, __bos0(buf), read) {
-#if __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
+#if __ANDROID_API__ >= 21 && __BIONIC_FORTIFY_RUNTIME_CHECKS_ENABLED
     size_t bos = __bos0(buf);
 
     if (!__bos_trivially_ge_no_overflow(bos, count)) {

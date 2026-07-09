@@ -158,15 +158,18 @@ int sched_setparam(pid_t __pid, const struct sched_param* _Nonnull __param);
  */
 int sched_getparam(pid_t __pid, struct sched_param* _Nonnull __param);
 
+#if __BIONIC_AVAILABILITY_GUARD(17)
 /**
  * [sched_rr_get_interval(2)](https://man7.org/linux/man-pages/man2/sched_rr_get_interval.2.html)
  * queries the round-robin time quantum for the given thread.
  *
  * Returns 0 on success and returns -1 and sets `errno` on failure.
  */
-int sched_rr_get_interval(pid_t __pid, struct timespec* _Nonnull __quantum);
+int sched_rr_get_interval(pid_t __pid, struct timespec* _Nonnull __quantum) __INTRODUCED_IN(17);
+#endif /* __BIONIC_AVAILABILITY_GUARD(17) */
 
 #if defined(__USE_GNU)
+#if __BIONIC_AVAILABILITY_GUARD(17)
 /**
  * [clone(2)](https://man7.org/linux/man-pages/man2/clone.2.html)
  * creates a new child process.
@@ -174,7 +177,8 @@ int sched_rr_get_interval(pid_t __pid, struct timespec* _Nonnull __quantum);
  * Returns the pid of the child to the caller on success and
  * returns -1 and sets `errno` on failure.
  */
-int clone(int (* __BIONIC_COMPLICATED_NULLNESS __fn)(void* __BIONIC_COMPLICATED_NULLNESS ), void* __BIONIC_COMPLICATED_NULLNESS __child_stack, int __flags, void* _Nullable __arg, ...);
+int clone(int (* __BIONIC_COMPLICATED_NULLNESS __fn)(void* __BIONIC_COMPLICATED_NULLNESS ), void* __BIONIC_COMPLICATED_NULLNESS __child_stack, int __flags, void* _Nullable __arg, ...) __INTRODUCED_IN(17);
+#endif /* __BIONIC_AVAILABILITY_GUARD(17) */
 #endif
 
 #if defined(__USE_GNU)
@@ -191,23 +195,27 @@ int clone3(struct clone_args* __cl_args, size_t __size, int (* __BIONIC_COMPLICA
 #endif
 
 #if defined(__USE_GNU)
+#if __BIONIC_AVAILABILITY_GUARD(17)
 /**
  * [unshare(2)](https://man7.org/linux/man-pages/man2/unshare.2.html)
  * disassociates part of the caller's execution context.
  *
  * Returns 0 on success and returns -1 and sets `errno` on failure.
  */
-int unshare(int __flags);
+int unshare(int __flags) __INTRODUCED_IN(17);
+#endif /* __BIONIC_AVAILABILITY_GUARD(17) */
 #endif
 
 #if defined(__USE_GNU)
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /**
  * [setns(2)](https://man7.org/linux/man-pages/man2/setns.2.html)
  * reassociates a thread with a different namespace.
  *
  * Returns 0 on success and returns -1 and sets `errno` on failure.
  */
-int setns(int __fd, int __ns_type);
+int setns(int __fd, int __ns_type) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 #endif
 
 #if defined(__USE_GNU)

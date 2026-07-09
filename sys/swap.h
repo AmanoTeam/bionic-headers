@@ -51,18 +51,20 @@ __BEGIN_DECLS
 /** See SWAP_FLAG_PREFER. */
 #define SWAP_FLAG_PRIO_SHIFT 0
 
+#if __BIONIC_AVAILABILITY_GUARD(19)
 /**
  * [swapon(2)](https://man7.org/linux/man-pages/man2/swapon.2.html) enables swapping.
  *
  * Returns 0 on success, and returns -1 and sets `errno` on failure.
  */
-int swapon(const char* _Nonnull __path,  int __flags);
+int swapon(const char* _Nonnull __path,  int __flags) __INTRODUCED_IN(19);
 
 /**
  * [swapoff(2)](https://man7.org/linux/man-pages/man2/swapoff.2.html) disables swapping.
  *
  * Returns 0 on success, and returns -1 and sets `errno` on failure.
  */
-int swapoff(const char* _Nonnull __path);
+int swapoff(const char* _Nonnull __path) __INTRODUCED_IN(19);
+#endif /* __BIONIC_AVAILABILITY_GUARD(19) */
 
 __END_DECLS

@@ -37,7 +37,11 @@
 __BEGIN_DECLS
 
 int inotify_init(void);
-int inotify_init1(int __flags);
+
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int inotify_init1(int __flags) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
+
 int inotify_add_watch(int __fd, const char* _Nonnull __path, uint32_t __mask);
 int inotify_rm_watch(int __fd, uint32_t __watch_descriptor);
 

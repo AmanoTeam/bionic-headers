@@ -1305,6 +1305,9 @@
 #if defined(__NR_tee)
   #define SYS_tee __NR_tee
 #endif
+#if defined(__NR_sysmips)
+  #define SYS_sysmips __NR_sysmips
+#endif
 #if defined(__NR_tgkill)
   #define SYS_tgkill __NR_tgkill
 #endif

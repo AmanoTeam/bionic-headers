@@ -51,6 +51,7 @@ __BEGIN_DECLS
  */
 int epoll_create(int __size);
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /**
  * [epoll_create1(2)](https://man7.org/linux/man-pages/man2/epoll_create1.2.html)
  * creates a new [epoll](https://man7.org/linux/man-pages/man7/epoll.7.html)
@@ -59,7 +60,8 @@ int epoll_create(int __size);
  * Returns a new file descriptor on success and returns -1 and sets `errno` on
  * failure.
  */
-int epoll_create1(int __flags);
+int epoll_create1(int __flags) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 /**
  * [epoll_ctl(2)](https://man7.org/linux/man-pages/man2/epoll_ctl.2.html)
@@ -78,10 +80,12 @@ int epoll_ctl(int __epoll_fd, int __op, int __fd, struct epoll_event* __BIONIC_C
  */
 int epoll_wait(int __epoll_fd, struct epoll_event* _Nonnull __events, int __event_count, int __timeout_ms);
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /**
  * Like epoll_wait() but atomically applying the given signal mask.
  */
-int epoll_pwait(int __epoll_fd, struct epoll_event* _Nonnull __events, int __event_count, int __timeout_ms, const sigset_t* _Nullable __mask);
+int epoll_pwait(int __epoll_fd, struct epoll_event* _Nonnull __events, int __event_count, int __timeout_ms, const sigset_t* _Nullable __mask) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #if __BIONIC_AVAILABILITY_GUARD(28)
 /**

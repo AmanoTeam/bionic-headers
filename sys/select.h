@@ -70,9 +70,11 @@ typedef struct {
 #define __FDMASK(fd) (1UL << ((fd) % NFDBITS))
 #define __FDS_BITS(type, set) (__BIONIC_CAST(static_cast, type, set)->fds_bits)
 
-void __FD_CLR_chk(int, fd_set* _Nonnull , size_t);
-void __FD_SET_chk(int, fd_set* _Nonnull, size_t);
-int __FD_ISSET_chk(int, const fd_set* _Nonnull, size_t);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+void __FD_CLR_chk(int, fd_set* _Nonnull , size_t) __INTRODUCED_IN(21);
+void __FD_SET_chk(int, fd_set* _Nonnull, size_t) __INTRODUCED_IN(21);
+int __FD_ISSET_chk(int, const fd_set* _Nonnull, size_t) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 /**
  * FD_CLR() with no bounds checking for users that allocated their own set.
@@ -100,6 +102,7 @@ int __FD_ISSET_chk(int, const fd_set* _Nonnull, size_t);
  */
 #define FD_ZERO(set) __builtin_memset(set, 0, sizeof(*__BIONIC_CAST(static_cast, const fd_set*, set)))
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /**
  * Removes `fd` from the given set.
  * Limited to fds under 1024.
@@ -123,6 +126,11 @@ int __FD_ISSET_chk(int, const fd_set* _Nonnull, size_t);
  * rather than using __FD_ISSET().
  */
 #define FD_ISSET(fd, set) __FD_ISSET_chk(fd, set, __bos(set))
+#else
+#define FD_CLR(fd, set) __FD_CLR(fd, set)
+#define FD_SET(fd, set) __FD_SET(fd, set)
+#define FD_ISSET(fd, set) __FD_ISSET(fd, set)
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 /**
  * [select(2)](https://man7.org/linux/man-pages/man2/select.2.html) waits on a

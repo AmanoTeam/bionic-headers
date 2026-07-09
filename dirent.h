@@ -116,6 +116,7 @@ DIR* _Nullable fdopendir(int __dir_fd);
  */
 struct dirent* _Nullable readdir(DIR* _Nonnull __dir);
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /**
  * [readdir64(3)](https://man7.org/linux/man-pages/man3/readdir.3.html)
  * returns the next directory entry in the given directory.
@@ -124,10 +125,11 @@ struct dirent* _Nullable readdir(DIR* _Nonnull __dir);
  * or returns null and leaves `errno` unchanged at the end of the directory,
  * or returns null and sets `errno` on failure.
  */
-struct dirent64* _Nullable readdir64(DIR* _Nonnull __dir);
+struct dirent64* _Nullable readdir64(DIR* _Nonnull __dir) __INTRODUCED_IN(21);
+int readdir64_r(DIR* _Nonnull __dir, struct dirent64* _Nonnull __entry, struct dirent64* _Nullable * _Nonnull __buffer)  __INTRODUCED_IN(21) __attribute__((__deprecated__("readdir64_r is deprecated; use readdir64 instead")));
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 int readdir_r(DIR* _Nonnull __dir, struct dirent* _Nonnull __entry, struct dirent* _Nullable * _Nonnull __buffer) __attribute__((__deprecated__("readdir_r is deprecated; use readdir instead")));
-int readdir64_r(DIR* _Nonnull __dir, struct dirent64* _Nonnull __entry, struct dirent64* _Nullable * _Nonnull __buffer) __attribute__((__deprecated__("readdir64_r is deprecated; use readdir64 instead")));
 
 /**
  * [closedir(3)](https://man7.org/linux/man-pages/man3/closedir.3.html)
@@ -181,11 +183,13 @@ int dirfd(DIR* _Nonnull __dir);
  */
 int alphasort(const struct dirent* _Nonnull * _Nonnull __lhs, const struct dirent* _Nonnull * _Nonnull __rhs);
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /**
  * [alphasort64(3)](https://man7.org/linux/man-pages/man3/alphasort.3.html) is a
  * comparator for use with scandir64() that uses strcmp().
  */
-int alphasort64(const struct dirent64* _Nonnull * _Nonnull __lhs, const struct dirent64* _Nonnull * _Nonnull __rhs);
+int alphasort64(const struct dirent64* _Nonnull * _Nonnull __lhs, const struct dirent64* _Nonnull * _Nonnull __rhs) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 /**
  * [scandir(3)](https://man7.org/linux/man-pages/man3/scandir.3.html)
@@ -199,6 +203,7 @@ int alphasort64(const struct dirent64* _Nonnull * _Nonnull __lhs, const struct d
  */
 int scandir(const char* _Nonnull __path, struct dirent* _Nonnull * _Nonnull * _Nonnull __name_list, int (* _Nullable __filter)(const struct dirent* _Nonnull), int (* _Nullable __comparator)(const struct dirent* _Nonnull * _Nonnull, const struct dirent* _Nonnull * _Nonnull));
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /**
  * [scandir64(3)](https://man7.org/linux/man-pages/man3/scandir.3.html)
  * scans all the directory `__path`, filtering entries with `__filter` and
@@ -209,7 +214,8 @@ int scandir(const char* _Nonnull __path, struct dirent* _Nonnull * _Nonnull * _N
  * Returns the number of entries returned in the list on success,
  * and returns -1 and sets `errno` on failure.
  */
-int scandir64(const char* _Nonnull __path, struct dirent64* _Nonnull * _Nonnull * _Nonnull __name_list, int (* _Nullable __filter)(const struct dirent64* _Nonnull), int (* _Nullable __comparator)(const struct dirent64* _Nonnull * _Nonnull, const struct dirent64* _Nonnull * _Nonnull));
+int scandir64(const char* _Nonnull __path, struct dirent64* _Nonnull * _Nonnull * _Nonnull __name_list, int (* _Nullable __filter)(const struct dirent64* _Nonnull), int (* _Nullable __comparator)(const struct dirent64* _Nonnull * _Nonnull, const struct dirent64* _Nonnull * _Nonnull)) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #if defined(__USE_GNU) && __BIONIC_AVAILABILITY_GUARD(24)
 /**

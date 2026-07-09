@@ -69,6 +69,6 @@ typedef struct crash_detail_t crash_detail_t;
  * for API more suited to the use case where the caller doesn't _expect_ a
  * crash but would like to see the information _if_ a crash happens.
  */
-void android_set_abort_message(const char* _Nullable __msg);
+void android_set_abort_message(const char* _Nullable __msg) __INTRODUCED_IN(21);
 
 __END_DECLS

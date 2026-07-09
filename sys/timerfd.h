@@ -42,6 +42,7 @@
 
 __BEGIN_DECLS
 
+#if __BIONIC_AVAILABILITY_GUARD(19)
 /*! \macro TFD_CLOEXEC
  * The timerfd_create() flag for a close-on-exec file descriptor.
  */
@@ -55,7 +56,7 @@ __BEGIN_DECLS
  *
  * Returns the new file descriptor on success, and returns -1 and sets `errno` on failure.
  */
-int timerfd_create(clockid_t __clock, int __flags);
+int timerfd_create(clockid_t __clock, int __flags) __INTRODUCED_IN(19);
 
 /** The timerfd_settime() flag to use absolute rather than relative times. */
 #define TFD_TIMER_ABSTIME (1 << 0)
@@ -68,7 +69,7 @@ int timerfd_create(clockid_t __clock, int __flags);
  *
  * Returns 0 on success, and returns -1 and sets `errno` on failure.
  */
-int timerfd_settime(int __fd, int __flags, const struct itimerspec* _Nonnull __new_value, struct itimerspec* _Nullable __old_value);
+int timerfd_settime(int __fd, int __flags, const struct itimerspec* _Nonnull __new_value, struct itimerspec* _Nullable __old_value) __INTRODUCED_IN(19);
 
 /**
  * [timerfd_gettime(2)](https://man7.org/linux/man-pages/man2/timerfd_gettime.2.html) queries the
@@ -76,6 +77,7 @@ int timerfd_settime(int __fd, int __flags, const struct itimerspec* _Nonnull __n
  *
  * Returns 0 on success, and returns -1 and sets `errno` on failure.
  */
-int timerfd_gettime(int __fd, struct itimerspec* _Nonnull __current_value);
+int timerfd_gettime(int __fd, struct itimerspec* _Nonnull __current_value) __INTRODUCED_IN(19);
+#endif /* __BIONIC_AVAILABILITY_GUARD(19) */
 
 __END_DECLS

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The Android Open Source Project
+ * Copyright (C) 2016 The Android Open Source Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,9 +26,25 @@
  * SUCH DAMAGE.
  */
 
-__BIONIC_MEMSET_EXPLICIT_INLINE void* _Nonnull memset_explicit(void* _Nonnull __dst, int __ch, size_t __n) {
-  void* __result = memset(__dst, __ch, __n);
-  // https://bugs.llvm.org/show_bug.cgi?id=15495
-  __asm__ __volatile__("" : : "r"(__dst) : "memory");
-  return __result;
+#ifndef _ANDROID_LEGACY_SYS_WAIT_INLINES_H_
+#define _ANDROID_LEGACY_SYS_WAIT_INLINES_H_
+
+#include <sys/cdefs.h>
+
+#if __ANDROID_API__ < 18
+
+#include <sys/syscall.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+__BEGIN_DECLS
+
+__static_inline__ pid_t wait4(pid_t pid, int* status, int options, struct rusage* rusage) {
+  return __BIONIC_CAST(static_cast, pid_t, syscall(__NR_wait4, pid, status, options, rusage));
 }
+
+__END_DECLS
+
+#endif /* __ANDROID_API__ < 18 */
+
+#endif /* _ANDROID_LEGACY_SYS_WAIT_INLINES_H_ */

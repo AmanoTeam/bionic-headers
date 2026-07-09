@@ -32,7 +32,16 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
+#if defined(__riscv) && defined(__GNUC__)
+/*
+* The unwinder used by GCC requires a generic definition of the sigcontext struct,
+* but Bionic does not provide that.
+*/
+#include <bits/sigcontext_riscv64.h>
+#else
 #include <asm/sigcontext.h>
+#endif
+
 #include <bits/pthread_types.h>
 #include <bits/signal_types.h>
 #include <bits/timespec.h>
@@ -48,11 +57,13 @@ __BEGIN_DECLS
  */
 #define SIG_HOLD __BIONIC_CAST(reinterpret_cast, sighandler_t, 2)
 
+#if __BIONIC_AVAILABILITY_GUARD(21)
 /* We take a few real-time signals for ourselves. May as well use the same names as glibc. */
 #define SIGRTMIN (__libc_current_sigrtmin())
 #define SIGRTMAX (__libc_current_sigrtmax())
-int __libc_current_sigrtmin(void);
-int __libc_current_sigrtmax(void);
+int __libc_current_sigrtmin(void) __INTRODUCED_IN(21);
+int __libc_current_sigrtmax(void) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 extern const char* _Nonnull const sys_siglist[_NSIG];
 extern const char* _Nonnull const sys_signame[_NSIG]; /* BSD compatibility. */
@@ -67,32 +78,42 @@ int sigaction64(int __signal, const struct sigaction64* _Nullable __new_action, 
 
 int siginterrupt(int __signal, int __flag);
 
-sighandler_t _Nonnull signal(int __signal, sighandler_t _Nullable __handler);
-int sigaddset(sigset_t* _Nonnull __set, int __signal);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+sighandler_t _Nonnull signal(int __signal, sighandler_t _Nullable __handler) __INTRODUCED_IN(21);
+int sigaddset(sigset_t* _Nonnull __set, int __signal) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #if __BIONIC_AVAILABILITY_GUARD(28)
 int sigaddset64(sigset64_t* _Nonnull __set, int __signal) __INTRODUCED_IN(28);
 #endif
 
-int sigdelset(sigset_t* _Nonnull __set, int __signal);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int sigdelset(sigset_t* _Nonnull __set, int __signal) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #if __BIONIC_AVAILABILITY_GUARD(28)
 int sigdelset64(sigset64_t* _Nonnull __set, int __signal) __INTRODUCED_IN(28);
 #endif
 
-int sigemptyset(sigset_t* _Nonnull __set);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int sigemptyset(sigset_t* _Nonnull __set) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #if __BIONIC_AVAILABILITY_GUARD(28)
 int sigemptyset64(sigset64_t* _Nonnull __set) __INTRODUCED_IN(28);
 #endif
 
-int sigfillset(sigset_t* _Nonnull __set);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int sigfillset(sigset_t* _Nonnull __set) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #if __BIONIC_AVAILABILITY_GUARD(28)
 int sigfillset64(sigset64_t* _Nonnull __set) __INTRODUCED_IN(28);
 #endif
 
-int sigismember(const sigset_t* _Nonnull __set, int __signal);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int sigismember(const sigset_t* _Nonnull __set, int __signal) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #if __BIONIC_AVAILABILITY_GUARD(28)
 int sigismember64(const sigset64_t* _Nonnull __set, int __signal) __INTRODUCED_IN(28);
@@ -153,12 +174,17 @@ sighandler_t _Nonnull sigset(int __signal, sighandler_t _Nullable __handler)
 int raise(int __signal);
 int kill(pid_t __pid, int __signal);
 int killpg(int __pgrp, int __signal);
-int tgkill(int __tgid, int __tid, int __signal);
+
+#if __BIONIC_AVAILABILITY_GUARD(16)
+int tgkill(int __tgid, int __tid, int __signal) __INTRODUCED_IN(16);
+#endif /* __BIONIC_AVAILABILITY_GUARD(16) */
 
 int sigaltstack(const stack_t* _Nullable __new_signal_stack, stack_t*  _Nullable __old_signal_stack);
 
-void psiginfo(const siginfo_t* _Nonnull __info, const char* _Nullable __msg);
-void psignal(int __signal, const char* _Nullable __msg);
+#if __BIONIC_AVAILABILITY_GUARD(17)
+void psiginfo(const siginfo_t* _Nonnull __info, const char* _Nullable __msg) __INTRODUCED_IN(17);
+void psignal(int __signal, const char* _Nullable __msg) __INTRODUCED_IN(17);
+#endif /* __BIONIC_AVAILABILITY_GUARD(17) */
 
 int pthread_kill(pthread_t __pthread, int __signal);
 
@@ -228,5 +254,9 @@ int str2sig(const char* _Nonnull __name, int* _Nonnull __signal) __INTRODUCED_IN
 #endif
 
 __END_DECLS
+
+#if __ANDROID_API__ < 21
+#include <android/legacy_signal_inlines.h>
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #endif

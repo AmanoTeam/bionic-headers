@@ -117,11 +117,13 @@ typedef struct {
 	int fts_options;		/* fts_open options, global flags */
 } FTS;
 
-FTSENT* _Nullable fts_children(FTS* _Nonnull __fts, int __options);
-int fts_close(FTS* _Nonnull __fts);
-FTS* _Nullable fts_open(char* _Nullable const* _Nonnull __path, int __options, int (* _Nullable __comparator)(const FTSENT* _Nonnull * _Nonnull  __lhs, const FTSENT* _Nonnull * _Nonnull __rhs));
-FTSENT* _Nullable fts_read(FTS* _Nonnull __fts);
-int fts_set(FTS* _Nonnull __fts, FTSENT* _Nonnull __entry, int __options);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+FTSENT* _Nullable fts_children(FTS* _Nonnull __fts, int __options) __INTRODUCED_IN(21);
+int fts_close(FTS* _Nonnull __fts) __INTRODUCED_IN(21);
+FTS* _Nullable fts_open(char* _Nullable const* _Nonnull __path, int __options, int (* _Nullable __comparator)(const FTSENT* _Nonnull * _Nonnull  __lhs, const FTSENT* _Nonnull * _Nonnull __rhs)) __INTRODUCED_IN(21);
+FTSENT* _Nullable fts_read(FTS* _Nonnull __fts) __INTRODUCED_IN(21);
+int fts_set(FTS* _Nonnull __fts, FTSENT* _Nonnull __entry, int __options) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 __END_DECLS
 

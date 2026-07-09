@@ -93,7 +93,7 @@
 // downstream in vendor or app code).
 #define	__inline __inline__
 
-#define __always_inline __attribute__((__always_inline__))
+#define __always_inline __attribute__((__always_inline__)) __inline
 #define __attribute_const__ __attribute__((__const__))
 #define __attribute_pure__ __attribute__((__pure__))
 #define __dead __attribute__((__noreturn__))
@@ -142,9 +142,15 @@
 #define __nodiscard __attribute__((__warn_unused_result__))
 #define __wur __nodiscard
 
+#if defined(__clang__)
 #define __enable_if(cond, msg) __attribute__((__enable_if__(cond, msg)))
 #define __clang_error_if(cond, msg) __attribute__((__diagnose_if__(cond, msg, "error")))
 #define __clang_warning_if(cond, msg) __attribute__((__diagnose_if__(cond, msg, "warning")))
+#else
+#define __enable_if(cond, msg)
+#define __clang_error_if(cond, msg)
+#define __clang_warning_if(cond, msg)
+#endif
 
 #if defined(ANDROID_STRICT)
 /*
@@ -251,34 +257,50 @@
 
 #if defined(__BIONIC_FORTIFY)
 #  define __bos0(s) __bosn((s), 0)
-#  if _FORTIFY_SOURCE >= 3
-#    define __pass_object_size_n(n) __attribute__((__pass_dynamic_object_size__(n)))
+#  if defined(__clang__)
+#    if _FORTIFY_SOURCE >= 3
+#      define __pass_object_size_n(n) __attribute__((__pass_dynamic_object_size__(n)))
+#    else
+#      define __pass_object_size_n(n) __attribute__((__pass_object_size__(n)))
+#    endif
 #  else
-#    define __pass_object_size_n(n) __attribute__((__pass_object_size__(n)))
+#    define __pass_object_size_n(n)
 #  endif
 
 /*
  * FORTIFY'ed functions all have either enable_if or pass_object_size, which
  * makes taking their address impossible. Saying (&read)(foo, bar, baz); will
  * therefore call the unFORTIFYed version of read.
- */
-#  define __call_bypassing_fortify(fn) (&fn)
-/*
+ *
  * Because clang-FORTIFY uses overloads, we can't mark functions as `extern inline` without making
  * them available externally. FORTIFY'ed functions try to be as close to possible as 'invisible';
  * having stack protectors detracts from that (b/182948263).
  */
-#  define __BIONIC_FORTIFY_INLINE static __inline __attribute__((__no_stack_protector__)) \
-      __always_inline
+#  if defined(__clang__)
+#    define __BIONIC_FORTIFY_INLINE static __inline __attribute__((__no_stack_protector__)) \
+         __always_inline
 /*
  * We should use __BIONIC_FORTIFY_VARIADIC instead of __BIONIC_FORTIFY_INLINE
  * for variadic functions because compilers cannot inline them.
  * The __always_inline attribute is useless, misleading, and could trigger
  * clang compiler bug to incorrectly inline variadic functions.
  */
-#  define __BIONIC_FORTIFY_VARIADIC static __inline
+#    define __BIONIC_FORTIFY_VARIADIC static __inline
 /* Error functions don't have bodies, so they can just be static. */
-#  define __BIONIC_ERROR_FUNCTION_VISIBILITY static __unused
+#    define __BIONIC_ERROR_FUNCTION_VISIBILITY static __unused
+#    define __call_bypassing_fortify(fn) (&fn)
+#  else
+#    define __BIONIC_FORTIFY_INLINE extern __inline __attribute__((__always_inline__, \
+         __gnu_inline__, __no_stack_protector__))
+#    define __BIONIC_FORTIFY_VARIADIC extern __inline __attribute__((__gnu_inline__, \
+         __no_stack_protector__))
+#    define __BIONIC_ERROR_FUNCTION_VISIBILITY static __unused
+#    define __call_bypassing_fortify(fn)                     \
+       __extension__({                                      \
+         extern __typeof(fn) __bionic_bypass_##fn __asm__(#fn); \
+         __bionic_bypass_##fn;                               \
+       })
+#  endif
 #else
 /* Further increase sharing for some inline functions */
 #  define __pass_object_size_n(n)
@@ -308,9 +330,14 @@
 #  define __BIONIC_INCLUDE_FORTIFY_HEADERS 1
 #endif
 
+#if defined(__clang__)
 #define __overloadable __attribute__((__overloadable__))
 
 #define __diagnose_as_builtin(...) __attribute__((__diagnose_as_builtin__(__VA_ARGS__)))
+#else
+#define __overloadable
+#define __diagnose_as_builtin(...)
+#endif
 
 /* Used to tag non-static symbols that are private and never exposed by the shared library. */
 #define __LIBC_HIDDEN__ __attribute__((__visibility__("hidden")))
@@ -356,6 +383,265 @@
  *    is different but similar.
  */
 #define __RENAME(x) __asm__(#x)
+
+#if defined(__cplusplus)
+	#define __static_inline__ static inline
+#else
+	#define __static_inline__ static __inline
+#endif
+
+#if defined(__cplusplus)
+	#if __cplusplus >= 201103L
+		#define __THROW noexcept (true)
+	#else
+		#define __THROW throw ()
+	#endif
+	
+	#define __THROWNL __THROW
+#else
+	#define __THROW __attribute__((__nothrow__ , __leaf__))
+	#define __THROWNL __attribute__((__nothrow__))
+#endif
+
+#if defined(__cplusplus)
+	#define __REDIRECT_NTH(name) __THROW __RENAME(#name)
+	#define __REDIRECT_IF_FILE_OFFSET64_NTH(name) __THROW __RENAME_IF_FILE_OFFSET64(#name)
+#else
+	#define __REDIRECT_NTH(name) __RENAME(#name) __THROW
+	#define __REDIRECT_IF_FILE_OFFSET64_NTH(name) __RENAME_IF_FILE_OFFSET64(#name) __THROW
+#endif
+
+#define _Nonnull
+#define _Nullable
+#define _Null_unspecified
+
+#if !defined(__ANDROID_API_G__)
+#define __ANDROID_API_G__ 9
+#endif
+
+#if !defined(__ANDROID_API_I__)
+#define __ANDROID_API_I__ 14
+#endif
+
+#if !defined(__ANDROID_API_J__)
+#define __ANDROID_API_J__ 16
+#endif
+
+#if !defined(__ANDROID_API_J_MR1__)
+#define __ANDROID_API_J_MR1__ 17
+#endif
+
+#if !defined(__ANDROID_API_J_MR2__)
+#define __ANDROID_API_J_MR2__ 18
+#endif
+
+#if !defined(__ANDROID_API_K__)
+#define __ANDROID_API_K__ 19
+#endif
+
+#if !defined(__ANDROID_API_L__)
+#define __ANDROID_API_L__ 21
+#endif
+
+#if !defined(__ANDROID_API_L_MR1__)
+#define __ANDROID_API_L_MR1__ 22
+#endif
+
+#if !defined(__ANDROID_API_M__)
+#define __ANDROID_API_M__ 23
+#endif
+
+#if !defined(__ANDROID_API_N__)
+#define __ANDROID_API_N__ 24
+#endif
+
+#if !defined(__ANDROID_API_N_MR1__)
+#define __ANDROID_API_N_MR1__ 25
+#endif
+
+#if !defined(__ANDROID_API_O__)
+#define __ANDROID_API_O__ 26
+#endif
+
+#if !defined(__ANDROID_API_O_MR1__)
+#define __ANDROID_API_O_MR1__ 27
+#endif
+
+#if !defined(__ANDROID_API_P__)
+#define __ANDROID_API_P__ 28
+#endif
+
+#if !defined(__ANDROID_API_Q__)
+#define __ANDROID_API_Q__ 29
+#endif
+
+#if !defined(__ANDROID_API_R__)
+#define __ANDROID_API_R__ 30
+#endif
+
+#if !defined(__ANDROID_API_S__)
+#define __ANDROID_API_S__ 31
+#endif
+
+#if !defined(__ANDROID_API_T__)
+#define __ANDROID_API_T__ 33
+#endif
+
+#if !defined(__ANDROID_API_U__)
+#define __ANDROID_API_U__ 34
+#endif
+
+#if !defined(__ANDROID_API_V__)
+#define __ANDROID_API_V__ 35
+#endif
+
+#if !defined(__ANDROID_API_W__)
+#define __ANDROID_API_W__ 36
+#endif
+
+#if !defined(__ANDROID_API_X__)
+#define __ANDROID_API_X__ 37
+#endif
+
+#define __PINO_SYMBOL_UNAVAILABLE_ERROR__(a, b) ("This symbol is only available on Android " a " (API level " ___STRING(b) ") or higher")
+
+#if defined(__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__)
+	#define __PINO_SYMBOL_AVAILABILITY__(...) __attribute__((weak))
+#else
+	#define __PINO_SYMBOL_AVAILABILITY__(a, b) __attribute__((__error__(__PINO_SYMBOL_UNAVAILABLE_ERROR__(a, b))))
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_G__
+	#define __INTRODUCED_IN_API_G__ __PINO_SYMBOL_AVAILABILITY__("2.3.0", ANDROID_API_G)
+#else
+	#define __INTRODUCED_IN_API_G__ __INTRODUCED_IN(__ANDROID_API_G__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_I__
+	#define __INTRODUCED_IN_API_I__ __PINO_SYMBOL_AVAILABILITY__("4.0.1", __ANDROID_API_I__)
+#else
+	#define __INTRODUCED_IN_API_I__ __INTRODUCED_IN(__ANDROID_API_I__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_J__
+	#define __INTRODUCED_IN_API_J__ __PINO_SYMBOL_AVAILABILITY__("4.1", __ANDROID_API_J__)
+#else
+	#define __INTRODUCED_IN_API_J__ __INTRODUCED_IN(__ANDROID_API_J__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_J_MR1__
+	#define __INTRODUCED_IN_API_J_MR1__ __PINO_SYMBOL_AVAILABILITY__("4.2", __ANDROID_API_J_MR1__)
+#else
+	#define __INTRODUCED_IN_API_J_MR1__ __INTRODUCED_IN(__ANDROID_API_J_MR1__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_J_MR2__
+	#define __INTRODUCED_IN_API_J_MR2__ __PINO_SYMBOL_AVAILABILITY__("4.3", __ANDROID_API_J_MR2__)
+#else
+	#define __INTRODUCED_IN_API_J_MR2__ __INTRODUCED_IN(__ANDROID_API_J_MR2__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_K__
+	#define __INTRODUCED_IN_API_K__ __PINO_SYMBOL_AVAILABILITY__("4.4", __ANDROID_API_K__)
+#else
+	#define __INTRODUCED_IN_API_K__ __INTRODUCED_IN(__ANDROID_API_K__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_L__
+	#define __INTRODUCED_IN_API_L__ __PINO_SYMBOL_AVAILABILITY__("5.0", __ANDROID_API_L__)
+#else
+	#define __INTRODUCED_IN_API_L__ __INTRODUCED_IN(__ANDROID_API_L__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_L_MR1__
+	#define __INTRODUCED_IN_API_L_MR1__ __PINO_SYMBOL_AVAILABILITY__("5.1", __ANDROID_API_L_MR1__)
+#else
+	#define __INTRODUCED_IN_API_L_MR1__ __INTRODUCED_IN(__ANDROID_API_L_MR1__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_M__
+	#define __INTRODUCED_IN_API_M__ __PINO_SYMBOL_AVAILABILITY__("6", __ANDROID_API_M__)
+#else
+	#define __INTRODUCED_IN_API_M__ __INTRODUCED_IN(__ANDROID_API_M__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_N__
+	#define __INTRODUCED_IN_API_N__ __PINO_SYMBOL_AVAILABILITY__("7.0", __ANDROID_API_N__)
+#else
+	#define __INTRODUCED_IN_API_N__ __INTRODUCED_IN(__ANDROID_API_N__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_N_MR1__
+	#define __INTRODUCED_IN_API_N_MR1__ __PINO_SYMBOL_AVAILABILITY__("7.1", __ANDROID_API_N_MR1__)
+#else
+	#define __INTRODUCED_IN_API_N_MR1__ __INTRODUCED_IN(__ANDROID_API_N_MR1__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_O__
+	#define __INTRODUCED_IN_API_O__ __PINO_SYMBOL_AVAILABILITY__("8.0", __ANDROID_API_O__)
+#else
+	#define __INTRODUCED_IN_API_O__ __INTRODUCED_IN(__ANDROID_API_O__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_O_MR1__
+	#define __INTRODUCED_IN_API_O_MR1__ __PINO_SYMBOL_AVAILABILITY__("8.1", __ANDROID_API_O_MR1__)
+#else
+	#define __INTRODUCED_IN_API_O_MR1__ __INTRODUCED_IN(__ANDROID_API_O_MR1__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_P__
+	#define __INTRODUCED_IN_API_P__ __PINO_SYMBOL_AVAILABILITY__("9", __ANDROID_API_P__)
+#else
+	#define __INTRODUCED_IN_API_P__ __INTRODUCED_IN(__ANDROID_API_P__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_Q__
+	#define __INTRODUCED_IN_API_Q__ __PINO_SYMBOL_AVAILABILITY__("10", __ANDROID_API_Q__)
+#else
+	#define __INTRODUCED_IN_API_Q__ __INTRODUCED_IN(__ANDROID_API_Q__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_R__
+	#define __INTRODUCED_IN_API_R__ __PINO_SYMBOL_AVAILABILITY__("11", __ANDROID_API_R__)
+#else
+	#define __INTRODUCED_IN_API_R__ __INTRODUCED_IN(__ANDROID_API_Q__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_S__
+	#define __INTRODUCED_IN_API_S__ __PINO_SYMBOL_AVAILABILITY__("12", __ANDROID_API_S__)
+#else
+	#define __INTRODUCED_IN_API_S__ __INTRODUCED_IN(__ANDROID_API_S__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_T__
+	#define __INTRODUCED_IN_API_T__ __PINO_SYMBOL_AVAILABILITY__("13", __ANDROID_API_T__)
+#else
+	#define __INTRODUCED_IN_API_T__ __INTRODUCED_IN(__ANDROID_API_T__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_U__
+	#define __INTRODUCED_IN_API_U__ __PINO_SYMBOL_AVAILABILITY__("14", __ANDROID_API_U__)
+#else
+	#define __INTRODUCED_IN_API_U__ __INTRODUCED_IN(__ANDROID_API_U__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_V__
+	#define __INTRODUCED_IN_API_V__ __PINO_SYMBOL_AVAILABILITY__("15", __ANDROID_API_V__)
+#else
+	#define __INTRODUCED_IN_API_V__ __INTRODUCED_IN(__ANDROID_API_V__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_W__
+	#define __INTRODUCED_IN_API_W__ __PINO_SYMBOL_AVAILABILITY__("16", __ANDROID_API_W__)
+#else
+	#define __INTRODUCED_IN_API_W__ __INTRODUCED_IN(__ANDROID_API_W__)
+#endif
+
+#if __ANDROID_API__ < __ANDROID_API_X__
+	#define __INTRODUCED_IN_API_X__ __PINO_SYMBOL_AVAILABILITY__("17", __ANDROID_API_X__)
+#else
+	#define __INTRODUCED_IN_API_X__ __INTRODUCED_IN(__ANDROID_API_X__)
+#endif
 
 #include <android/versioning.h>
 #include <android/api-level.h>

@@ -31,7 +31,11 @@
 
 __BEGIN_DECLS
 
+#if defined(__clang__) && !__has_attribute(alloc_size)
 #define __BIONIC_ALLOC_SIZE(...) __attribute__((__alloc_size__(__VA_ARGS__)))
+#else
+#define __BIONIC_ALLOC_SIZE(...)
+#endif
 
 /**
  * [malloc(3)](https://man7.org/linux/man-pages/man3/malloc.3.html) allocates
@@ -118,6 +122,7 @@ void free(void* _Nullable __ptr);
  */
 __nodiscard void* _Nullable memalign(size_t __alignment, size_t __byte_count) __mallocfunc __BIONIC_ALLOC_SIZE(2);
 
+#if __BIONIC_AVAILABILITY_GUARD(17)
 /**
  * [malloc_usable_size(3)](https://man7.org/linux/man-pages/man3/malloc_usable_size.3.html)
  * returns the actual size of the given heap block.
@@ -128,12 +133,8 @@ __nodiscard void* _Nullable memalign(size_t __alignment, size_t __byte_count) __
  * case, you can define __BIONIC_DISABLE_MALLOC_USABLE_SIZE_FORTIFY_WARNINGS to disable the
  * compiler error.
  */
-__nodiscard size_t malloc_usable_size(const void* _Nullable __ptr)
-#if defined(_FORTIFY_SOURCE) && !defined(__BIONIC_DISABLE_MALLOC_USABLE_SIZE_FORTIFY_WARNINGS)
-    __clang_error_if(_FORTIFY_SOURCE >= 3,
-      "malloc_usable_size() and _FORTIFY_SOURCE>=3 are incompatible: see malloc_usable_size() documentation")
-#endif
-;
+__nodiscard size_t malloc_usable_size(const void* _Nullable __ptr) __INTRODUCED_IN(17);
+#endif /* __BIONIC_AVAILABILITY_GUARD(17) */
 
 #define __MALLINFO_BODY \
   /** Total number of non-mmapped bytes currently allocated from OS. */ \

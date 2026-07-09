@@ -741,6 +741,7 @@ int32_t AConfiguration_getSmallestScreenWidthDp(AConfiguration* config);
  */
 void AConfiguration_setSmallestScreenWidthDp(AConfiguration* config, int32_t value);
 
+#if __BIONIC_AVAILABILITY_GUARD(17)
 /**
  * Return the configuration's layout direction, or
  * ACONFIGURATION_LAYOUTDIR_ANY if not set.
@@ -755,6 +756,7 @@ int32_t AConfiguration_getLayoutDirection(AConfiguration* config) __INTRODUCED_I
  * Available since API level 17.
  */
 void AConfiguration_setLayoutDirection(AConfiguration* config, int32_t value) __INTRODUCED_IN(17);
+#endif /* __BIONIC_AVAILABILITY_GUARD(17) */
 
 /**
  * Return the configuration's grammatical gender, or ACONFIGURATION_GRAMMATICAL_GENDER_ANY if

@@ -77,6 +77,7 @@ void __system_property_read_callback(const prop_info* _Nonnull __pi,
     void* _Nullable __cookie) __INTRODUCED_IN(26);
 #endif
 
+#if __BIONIC_AVAILABILITY_GUARD(19)
 /**
  * Passes a `prop_info` for each system property to the provided
  * callback. Use __system_property_read_callback() to read the value of
@@ -86,7 +87,8 @@ void __system_property_read_callback(const prop_info* _Nonnull __pi,
  *
  * Returns 0 on success, or -1 on failure.
  */
-int __system_property_foreach(void (* _Nonnull __callback)(const prop_info* _Nonnull __pi, void* _Nullable __cookie), void* _Nullable __cookie);
+int __system_property_foreach(void (* _Nonnull __callback)(const prop_info* _Nonnull __pi, void* _Nullable __cookie), void* _Nullable __cookie) __INTRODUCED_IN(19);
+#endif /* __BIONIC_AVAILABILITY_GUARD(19) */
 
 /**
  * Waits for the specific system property identified by `pi` to be updated

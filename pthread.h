@@ -125,10 +125,18 @@ int pthread_attr_setstack(pthread_attr_t* _Nonnull __attr, void* _Nonnull __addr
 int pthread_attr_setstacksize(pthread_attr_t* _Nonnull __addr, size_t __size);
 
 int pthread_condattr_destroy(pthread_condattr_t* _Nonnull __attr);
-int pthread_condattr_getclock(const pthread_condattr_t* _Nonnull __attr, clockid_t* _Nonnull __clock);
+
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int pthread_condattr_getclock(const pthread_condattr_t* _Nonnull __attr, clockid_t* _Nonnull __clock) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
+
 int pthread_condattr_getpshared(const pthread_condattr_t* _Nonnull __attr, int* _Nonnull __shared);
 int pthread_condattr_init(pthread_condattr_t* _Nonnull __attr);
-int pthread_condattr_setclock(pthread_condattr_t* _Nonnull __attr, clockid_t __clock);
+
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int pthread_condattr_setclock(pthread_condattr_t* _Nonnull __attr, clockid_t __clock) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
+
 int pthread_condattr_setpshared(pthread_condattr_t* _Nonnull __attr, int __shared);
 
 int pthread_cond_broadcast(pthread_cond_t* _Nonnull __cond);
@@ -171,7 +179,9 @@ int pthread_getattr_np(pthread_t __pthread, pthread_attr_t* _Nonnull __attr);
 
 int pthread_getcpuclockid(pthread_t __pthread, clockid_t* _Nonnull __clock);
 
-pid_t pthread_gettid_np(pthread_t __pthread);
+#if __BIONIC_AVAILABILITY_GUARD(21)
+pid_t pthread_gettid_np(pthread_t __pthread) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 int pthread_join(pthread_t __pthread, void* _Nullable * _Nullable __return_value_ptr);
 
@@ -246,7 +256,10 @@ int pthread_mutex_clocklock(pthread_mutex_t* _Nonnull __mutex, clockid_t __clock
 int pthread_mutex_destroy(pthread_mutex_t* _Nonnull __mutex);
 int pthread_mutex_init(pthread_mutex_t* _Nonnull __mutex, const pthread_mutexattr_t* _Nullable __attr);
 int pthread_mutex_lock(pthread_mutex_t* _Nonnull __mutex);
-int pthread_mutex_timedlock(pthread_mutex_t* _Nonnull __mutex, const struct timespec* _Nullable __timeout);
+
+#if __BIONIC_AVAILABILITY_GUARD(21)
+int pthread_mutex_timedlock(pthread_mutex_t* _Nonnull __mutex, const struct timespec* _Nullable __timeout) __INTRODUCED_IN(21);
+#endif /* __BIONIC_AVAILABILITY_GUARD(21) */
 
 #if __BIONIC_AVAILABILITY_GUARD(28)
 /**

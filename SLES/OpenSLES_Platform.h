@@ -55,7 +55,7 @@ typedef unsigned long long          sl_uint64_t;
 #endif
 
 #ifndef SL_API_DEPRECATED
-#define SL_API_DEPRECATED(level) __attribute__((availability(android,deprecated=level)))
+#define SL_API_DEPRECATED(level) __attribute__((deprecated("since " #level)))
 #endif
 
 #endif /* _OPENSLES_PLATFORM_H_ */
